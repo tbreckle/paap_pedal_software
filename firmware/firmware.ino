@@ -1,8 +1,9 @@
-#include "Keyboard.h"
 #include <Bounce2.h>
 #include <EEPROM.h>
 
-const char VERSION[] = "0.0.1";
+#include "Keyboard.h"
+
+const char VERSION[] = "1.0.0";
 
 /* Change USB VID & PID:
 
@@ -14,7 +15,7 @@ const char VERSION[] = "0.0.1";
     <Arduino IDE installation folder>/hardware/arduino/avr/boards.txt
 
     Find the line starting with "micro.build.vid=" and change
-    the VID to 0xF143 (the same OpenFire uses). Change the PID
+    the VID to 0xF144 (OpenFire+1). Change the PID
     in the line starting with "micro.build.pid=" to 0x1001 or 0x1002
     depending on which pedal you are configuring.
     Change the product string in "micro.usb.usb_product=" to
@@ -90,7 +91,7 @@ void saveKeyCode() {
  */
 void processSerialCommand(String cmd) {
     cmd.trim();
-    
+
     if (cmd == "HEL") {
         Serial.println("LO");
     } else if (cmd == "KEY") {
@@ -137,10 +138,10 @@ void handleSerial() {
 void setup() {
     // Initialize serial communication.
     Serial.begin(115200);
-    
+
     // Load keycode from EEPROM.
     loadKeyCode();
-    
+
     // Setup the Bounce2 button with internal pullup.
     pedal.attach(PIN_PEDAL, INPUT_PULLUP);
     // Set debounce interval to 5ms.
@@ -149,7 +150,7 @@ void setup() {
     pedal.setPressedState(LOW);
 
     Keyboard.begin();
-    
+
 #ifdef DEBUG
     Serial.println("PAAP started.");
     Serial.print("Using key code: ");
@@ -169,7 +170,7 @@ void setup() {
 void loop() {
     // Handle serial commands.
     handleSerial();
-    
+
     // Update the Bounce2 button state.
     pedal.update();
 

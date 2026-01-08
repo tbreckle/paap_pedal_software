@@ -13,7 +13,12 @@ This document contains technical information for developers who want to build, m
 ├── app/                               # GUI configurator
 │   ├── Cargo.toml                    # Rust project configuration
 │   └── src/
-│       └── main.rs                   # Main application code
+│       ├── main.rs                   # Application entry point and main struct
+│       ├── config.rs                 # Configuration and theme management
+│       ├── connection.rs             # Connection state management
+│       ├── serial.rs                 # Serial port communication logic
+│       ├── ui.rs                     # UI components and rendering
+│       └── icon.rs                   # Application icon generation
 ├── README.md                         # User-facing documentation
 └── DEV.md                            # This file - developer documentation
 ```
@@ -238,7 +243,7 @@ Using Arduino Serial Monitor or any serial terminal at 115200 baud:
 To set a custom USB Vendor ID and Product ID, edit your board's `boards.txt` file (located in Arduino install folder → `hardware/arduino/avr/boards.txt`).
 
 For Arduino Pro Micro, update:
-- `micro.build.vid=` to `0xF143` (OpenFire compatible).
+- `micro.build.vid=` to `0xF144` (OpenFire+1).
 - `micro.build.pid=` to `0x1001` or `0x1002` (depending on pedal variant).
 - `micro.usb.usb_product=` to `PAAP_P1` or `PAAP_P2`.
 
@@ -348,42 +353,89 @@ RUST_LOG=info cargo run
 
 ## Configurator Development
 
-### Code Structure
+### Code Architecture
 
-The application is structured as a single-file egui application with:
+The application is structured as a modular Rust application with clear separation of concerns:
 
-- **`ThemeMode` enum**: Dark, Light, System theme options.
-- **`ConnectionState` enum**: Disconnected or Connected with port handle.
-- **`SerialPortApp` struct**: Main application state and UI logic.
+#### **main.rs** - Application Entry Point
+- **`SerialPortApp`**: Main application struct managing state and coordinating between modules.
   - `available_ports`: List of detected serial ports.
-  - `connection_state`: Current connection status.
-  - `key_to_emulate`: User input for key configuration.
-  - `error_message`: Optional error message for modal display.
+  - `connection_state`: Current connection status (from `connection` module).
+  - `ui_state`: UI-specific state (from `ui` module).
   - `theme_mode`: Current theme selection.
+- **`eframe::App` implementation**: Main update loop with action-based UI pattern.
+- Application initialization and window configuration.
+
+#### **config.rs** - Configuration Management
+- **`ThemeMode` enum**: Dark, Light, System theme options.
+- **`AppConfig` struct**: Persistent configuration storage.
+- Configuration loading and saving using `confy` crate.
+
+#### **connection.rs** - Connection State
+- **`ConnectionState` enum**: Disconnected or Connected with device details.
+  - Tracks: serial port handle, port name, current key, firmware version.
+- Helper methods for querying connection status.
+
+#### **serial.rs** - Serial Communication
+- **`SerialManager`**: Handles all serial port operations.
+  - Port discovery and display name formatting.
+  - Device connection handshake protocol (HEL/LO).
+  - Version retrieval (VER command).
+  - Key reading and writing (KEY command).
+  - Low-level serial response parsing and timeout handling.
+
+#### **ui.rs** - User Interface
+- **`UiState` struct**: UI-specific state (key input, error messages).
+- **`UiAction` enum**: Event-driven UI actions (Connect, Disconnect, etc.).
+- **Rendering functions**: Modular UI component rendering.
+  - `render_top_bar`: Port selection and refresh controls.
+  - `render_key_input`: Key configuration interface.
+  - `render_bottom_panel`: Status display and theme selector.
+  - `render_error_dialog`: Error modal window.
+  - `apply_theme`: Theme application logic.
+
+#### **icon.rs** - Application Icon
+- Icon generation for window title bar.
+- Creates a 32×32 keyboard icon programmatically.
 
 ### Communication Protocol
 
-#### Connection Handshake
+The `serial.rs` module implements the complete serial communication protocol:
+
+#### Connection Handshake (in `SerialManager::connect`)
 1. App sends: `HEL\n`.
 2. Device responds: `LO\n`.
-3. Timeout: 2 seconds.
+3. App sends: `VER\n`.
+4. Device responds: `VER<VERSION>\n`.
+5. App sends: `KEY\n`.
+6. Device responds: `KEY<CHAR>\n` where `<CHAR>` is the current key.
+7. Timeout: 2 seconds per command.
 
-#### Get Current Key
-1. App sends: `KEY\n`.
-2. Device responds: `KEY<CHAR>\n` where `<CHAR>` is the current key.
-3. Timeout: 2 seconds.
-
-#### Key Configuration
+#### Key Configuration (in `SerialManager::save_key`)
 1. App sends: `KEY<CHAR>\n` where `<CHAR>` is the new key.
 2. Device responds: `ACK\n` on success.
 3. Timeout: 2 seconds.
 
+All protocol implementation is isolated in the `serial` module, with helper functions:
+- `wait_for_simple_response`: Waits for exact string match (e.g., "LO", "ACK").
+- `wait_for_prefixed_response`: Waits for response starting with prefix (e.g., "VER", "KEY").
+
 ### UI Layout
 
-- **Top-right**: Port selection dropdown and refresh button.
-- **Center**: Key configuration input and save button.
-- **Bottom panel**: Connection status, port count, and theme selector.
-- **Modal**: Error messages displayed as centered dialogs.
+The UI is rendered by functions in the `ui` module:
+
+- **Top-right** (`render_top_bar`): Port selection dropdown and refresh button.
+- **Center** (`render_key_input`): Key configuration input and save button.
+- **Bottom panel** (`render_bottom_panel`): Connection status, port count, and theme selector.
+- **Modal** (`render_error_dialog`): Error messages displayed as centered dialogs.
+
+### Action-Based UI Pattern
+
+The application uses an action-based pattern to avoid borrow checker issues:
+1. UI rendering functions return `Option<UiAction>` instead of taking callbacks.
+2. Actions are collected during UI rendering.
+3. After all UI is rendered, actions are processed in the main update loop.
+4. This cleanly separates UI rendering (immutable borrows) from state mutation (mutable borrows).
 
 ## Dependencies
 
@@ -395,6 +447,8 @@ The application is structured as a single-file egui application with:
 | `serialport` | 4.5 | Serial port communication |
 | `log` | 0.4 | Logging facade |
 | `env_logger` | 0.11 | Logger implementation |
+| `confy` | 0.6 | Configuration file management |
+| `serde` | 1.0 | Serialization/deserialization |
 
 ### Build Profiles
 
@@ -482,24 +536,9 @@ The app logs all detected ports on startup with their details (VID, PID, manufac
 - Check for common issues: `cargo clippy`.
 - Ensure all warnings are addressed.
 - Write idiomatic Rust code.
-
-## Testing Checklist
-
-### Firmware
-- [ ] Compiles without errors or warnings.
-- [ ] Pedal press/release works correctly.
-- [ ] Serial protocol commands work.
-- [ ] EEPROM storage persists across power cycles.
-- [ ] Debug output is helpful (when enabled).
-
-### Configurator
-- [ ] Port detection works correctly.
-- [ ] Connection handshake succeeds with test device.
-- [ ] Key configuration saves successfully.
-- [ ] Error handling displays proper messages.
-- [ ] Theme switching works correctly.
-- [ ] Window resizing is disabled.
-- [ ] Modal dialogs appear centered.
+- Maintain module separation: keep UI, business logic, and serial communication separate.
+- Use the action-based pattern for UI interactions to avoid borrow checker issues.
+- Add comprehensive error handling with user-friendly error messages.
 
 ---
 
