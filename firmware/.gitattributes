@@ -1,0 +1,40 @@
+# Normalize line endings across platforms to LF
+* text=auto eol=lf
+
+# Ensure common source files use LF in working tree
+*.ino  text eol=lf linguist-language=C++
+*.cpp  text eol=lf
+*.c    text eol=lf
+*.h    text eol=lf
+*.hpp  text eol=lf
+*.S    text eol=lf
+*.md   text eol=lf
+*.txt  text eol=lf
+*.json text eol=lf
+*.yaml text eol=lf
+*.yml  text eol=lf
+*.sh   text eol=lf
+*.py   text eol=lf
+
+# Treat binary and build artifacts as binary (no text conversions)
+*.eep  binary
+*.hex  binary
+*.bin  binary
+*.elf  binary
+*.zip  binary
+*.tar  binary
+*.gz   binary
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.bmp  binary
+*.ico  binary
+*.pdf  binary
+
+# Mark generated files/folders so GitHub linguist excludes them
+_build/**  linguist-generated export-ignore
+sketch/**  linguist-generated export-ignore
+
+# Dependency files produced by build are generated
+_build/**/*.d linguist-generated
