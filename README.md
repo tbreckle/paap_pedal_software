@@ -1,8 +1,8 @@
-# PAAP — Arcade Pedal to Keyboard
+# PAAP — Arcade Mini Pedal Firmware and Configuration Tool
 
 [![Build Firmware](https://github.com/tbreckle/paap_pedal_software/actions/workflows/build-firmware.yaml/badge.svg)](https://github.com/tbreckle/paap_pedal_software/actions/workflows/build-firmware.yaml) [![Build App](https://github.com/tbreckle/paap_pedal_software/actions/workflows/build.yaml/badge.svg)](https://github.com/tbreckle/paap_pedal_software/actions/workflows/build.yaml)
 
-**PAAP** turns your arcade pedal into a keyboard key! Simply plug it in, press the pedal, and it types a key on your computer — perfect for arcade games, simulators, or any application where you want hands-free keyboard control.
+The **PAAP** (Perfectly Adequate Arcade Pedal) is a simple USB device that turns your arcade pedal into a keyboard keypress - perfect for arcade games and simulators. This repository contains an alternative firmware for the mini PAAP device as well as a configuration application to customize which key the pedal emulates.
 
 ## ✨ What You Get
 
@@ -14,7 +14,7 @@
 
 ## 🎯 What You Need
 
-- PAAP arcade pedal hardware ([available here](https://ko-fi.com/s/10c3e43f22) - created by JayBomb999)
+- Mini PAAP arcade pedal hardware ([available here](https://ko-fi.com/s/10c3e43f22) - created by JayBomb999)
 - A computer with a USB port
 - The PAAP Configurator app (included in this package)
 
@@ -23,7 +23,6 @@
 PAAP is perfect for:
 - Light gun arcade games (reload pedal)
 - Racing simulators (clutch, brake, gear shift)
-- Music applications (sustain pedal, drum trigger)
 - Accessibility (hands-free keyboard input)
 - Streaming (push-to-talk, scene switching)
 - Any application where you want foot-controlled keyboard input
@@ -44,7 +43,7 @@ Out of the box, your PAAP is configured with:
 
 ### 2. Configure Your Key (Optional)
 
-If you want to use a different key:
+If you want to use a different key (or have two pedals with different keys), follow these steps:
 
 1. Download and run the **PAAP Configurator** app (see below)
 2. Select your device from the dropdown menu
