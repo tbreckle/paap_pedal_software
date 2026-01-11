@@ -3,6 +3,9 @@ name = "paap-configurator"
 version = "1.0.0"
 edition = "2021"
 
+[package.metadata.msc]
+subsystem = "windows"
+
 [[bin]]
 name = "paap-configurator"
 path = "src/main.rs"
