@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7c3aed"/>
+      <stop offset="1" stop-color="#ec4899"/>
+    </linearGradient>
+    <linearGradient id="plate" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#ddd6fe"/>
+    </linearGradient>
+  </defs>
+  <rect width="256" height="256" rx="56" fill="url(#bg)"/>
+  <!-- Keycap -->
+  <rect x="146" y="34" width="76" height="76" rx="16" fill="#2e1065" opacity="0.35" transform="translate(0 6)"/>
+  <rect x="146" y="34" width="76" height="76" rx="16" fill="#faf5ff"/>
+  <rect x="156" y="42" width="56" height="54" rx="10" fill="#ffffff" stroke="#e9d5ff" stroke-width="2"/>
+  <path d="M174 54 v30 h22" fill="none" stroke="#7c3aed" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Press lines -->
+  <path d="M40 92 l18 14 M70 72 l10 20 M104 66 l2 22" stroke="#faf5ff" stroke-width="8" stroke-linecap="round" opacity="0.85"/>
+  <!-- Base -->
+  <rect x="32" y="178" width="192" height="36" rx="14" fill="#1e1036"/>
+  <rect x="32" y="178" width="192" height="12" rx="6" fill="#3b1f66"/>
+  <!-- Pedal plate, hinged at the back -->
+  <g transform="rotate(20 204 176)">
+    <rect x="44" y="148" width="166" height="30" rx="12" fill="url(#plate)" stroke="#2e1065" stroke-width="4"/>
+    <path d="M72 156 v14 M96 156 v14 M120 156 v14 M144 156 v14 M168 156 v14" stroke="#a78bfa" stroke-width="6" stroke-linecap="round"/>
+  </g>
+  <circle cx="204" cy="176" r="12" fill="#2e1065"/>
+  <circle cx="204" cy="176" r="5" fill="#c4b5fd"/>
+</svg>

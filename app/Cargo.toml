@@ -1,7 +1,7 @@
 [package]
 name = "paap-configurator"
-version = "1.0.0"
-edition = "2021"
+version = "0.0.0"
+edition = "2024"
 
 [package.metadata.msc]
 subsystem = "windows"
@@ -11,12 +11,24 @@ name = "paap-configurator"
 path = "src/main.rs"
 
 [dependencies]
-serialport = "4.5"
+serialport = "4.10"
 log = "0.4"
 env_logger = "0.11"
-eframe = "0.29"
-confy = "0.6"
+# Slint is used under the Slint Royalty-free Desktop, Mobile, and Web Applications License 2.0,
+# which requires the AboutSlint widget or the attribution badge (README.md).
+slint = { version = "1.18", default-features = false, features = [
+    "std",
+    "backend-winit",
+    "renderer-femtovg",
+    "renderer-software",
+    "accessibility",
+    "compat-1-2",
+] }
+confy = "2.0"
 serde = { version = "1.0", features = ["derive"] }
+
+[build-dependencies]
+slint-build = "1.18"
 
 [profile.dev]
 opt-level = 0           # No optimization.
