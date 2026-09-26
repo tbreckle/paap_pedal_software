@@ -206,7 +206,18 @@ PAAP firmware and configurator are released under the [MIT License](LICENSE).
 
 The configurator's user interface is built with [Slint](https://slint.dev), used under the [Slint Royalty-free Desktop, Mobile, and Web Applications License 2.0](https://github.com/slint-ui/slint/blob/master/LICENSES/LicenseRef-Slint-Royalty-free-2.0.md). The app also shows the Slint attribution in its **About** dialog.
 
-<details>
+<div align="center">
+
+**🪙 INSERT COIN TO CONTINUE 🪙**
+
+<sub>Built for lightgun and arcade fans.</sub>
+
+</div>
+
+
+
+---
+
 <summary><b>⚖️ Legal disclaimer</b></summary>
 
 **USE AT YOUR OWN RISK.** This software and firmware are provided "AS IS" without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose, and non-infringement.
@@ -218,15 +229,3 @@ The configurator's user interface is built with [Slint](https://slint.dev), used
 - This project is an independent effort and is not affiliated with or endorsed by any hardware manufacturer unless explicitly stated.
 
 This project is intended for personal, educational, and hobbyist use. Users modifying firmware or hardware configurations should have appropriate technical knowledge and accept full responsibility for their modifications.
-
-</details>
-
----
-
-<div align="center">
-
-**🪙 INSERT COIN TO CONTINUE 🪙**
-
-<sub>Built for lightgun and arcade fans.</sub>
-
-</div>
