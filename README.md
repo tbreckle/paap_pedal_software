@@ -1,163 +1,232 @@
-# PAAP — Arcade Mini Pedal Firmware and Configuration Tool
+<div align="center">
 
-[![Build Firmware](https://github.com/tbreckle/paap_pedal_software/actions/workflows/build-firmware.yaml/badge.svg)](https://github.com/tbreckle/paap_pedal_software/actions/workflows/build-firmware.yaml) [![Build App](https://github.com/tbreckle/paap_pedal_software/actions/workflows/build.yaml/badge.svg)](https://github.com/tbreckle/paap_pedal_software/actions/workflows/build.yaml)
+<img src="images/icon.png" alt="PAAP logo" width="160">
 
-The **PAAP** (Perfectly Adequate Arcade Pedal) is a simple USB device that turns your arcade pedal into a keyboard keypress - perfect for arcade games and simulators. This repository contains an alternative firmware for the mini PAAP device as well as a configuration application to customize which key the pedal emulates.
+# PAAP
 
-## ✨ What You Get
+### Perfectly Adequate Arcade Pedal
 
-- 🎮 **Plug & Play** - Works like a USB keyboard, no drivers needed
-- ⌨️ **Customizable Key** - Choose any keyboard key you want
-- 🖥️ **Easy Setup** - User-friendly app to configure your pedal
-- 💾 **Remembers Settings** - Your key choice is saved even after unplugging
-- 🪟 **Works Everywhere** - Compatible with Windows, Linux, and macOS
+**Turn an arcade foot pedal into a USB keyboard key: plug-and-play firmware plus a desktop app to pick the key and number up to 16 pedals.**
 
-## 🎯 What You Need
+[![CI](https://github.com/tbreckle/paap_pedal_software/actions/workflows/ci.yml/badge.svg?branch=develop)](https://github.com/tbreckle/paap_pedal_software/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/tbreckle/paap_pedal_software?sort=semver&color=ec4899&logo=github)](https://github.com/tbreckle/paap_pedal_software/releases)
+[![License: MIT](https://img.shields.io/badge/license-MIT-00c2a8)](LICENSE)
+![Platforms](https://img.shields.io/badge/app-Linux%20%7C%20Windows%20%7C%20macOS-7c3aed)
 
-- Mini PAAP arcade pedal hardware ([available here](https://ko-fi.com/s/10c3e43f22) - created by JayBomb999)
-- A computer with a USB port
-- The PAAP Configurator app (included in this package)
+![ATmega32U4](https://img.shields.io/badge/ATmega32U4-Arduino%20Micro-00979D?logo=arduino&logoColor=white)
+![Arduino AVR](https://img.shields.io/badge/Arduino%20AVR-1.8.6-00979D?logo=arduino&logoColor=white)
+![Rust](https://img.shields.io/badge/Rust-1.98-000000?logo=rust&logoColor=white)
+![Slint](https://img.shields.io/badge/UI-Slint%201.18-2379F4)
 
-## 🎮 Use Cases
+[**Download**](https://github.com/tbreckle/paap_pedal_software/releases) ·
+[Features](#-features) ·
+[Quick start](#-quick-start) ·
+[Multiple pedals](#-multiple-pedals) ·
+[Troubleshooting](#-troubleshooting) ·
+[Building](#-building-from-source)
 
-PAAP is perfect for:
-- Light gun arcade games (reload pedal)
-- Racing simulators (clutch, brake, gear shift)
-- Accessibility (hands-free keyboard input)
-- Streaming (push-to-talk, scene switching)
-- Any application where you want foot-controlled keyboard input
-
-## 📝 Default Settings
-
-Out of the box, your PAAP is configured with:
-- **Default key:** 'l' (lowercase L)
-- Your custom settings are saved and persist even after unplugging
-
-## 🚀 Quick Start
-
-### 1. Connect Your Pedal
-
-1. Plug the PAAP device into a USB port on your computer
-2. Your computer will recognize it as a keyboard (no installation needed!)
-3. By default, pressing the pedal types the letter 'l'
-
-### 2. Configure Your Key (Optional)
-
-If you want to use a different key (or have two pedals with different keys), follow these steps:
-
-1. Download and run the **PAAP Configurator** app (see below)
-2. Select your device from the dropdown menu
-3. Press the key you want on your keyboard
-4. Click "Save to device"
-5. Done! Your pedal now uses your chosen key
-
-## 🔧 PAAP Configurator App
-
-The configurator app makes it easy to change which key your pedal presses.
-
-### Installation
-
-**Windows:**
-1. Download `paap-configurator.exe` from the releases
-2. Double-click to run (no installation required)
-
-**Linux:**
-1. Download `paap-configurator` from the releases
-2. Make it executable: `chmod +x paap-configurator`
-3. Run it: `./paap-configurator`
-
-### How to Use
-
-1. **Connect** - Plug in your PAAP pedal
-2. **Open the app** - Launch PAAP Configurator
-3. **Select device** - Choose your pedal from the dropdown in the top-right corner
-4. **Pick your key** - Click in the "Key to emulate" field and press your desired key
-5. **Save** - Click "Save to device"
-6. **Test** - Open any text editor and press your pedal!
-
-### App Tips
-
-- 💡 The status bar shows if you're connected
-- 🎨 Switch between Dark and Light themes in the bottom-right
-- 🔄 Click "Refresh Ports" if your device doesn't appear
-- 📱 Current key is displayed in the status bar when connected
-
-## ❓ Troubleshooting
-
-### My pedal isn't working
-
-**Nothing happens when I press the pedal:**
-- Check that the USB cable is fully plugged in
-- Try a different USB port
-- Make sure your pedal hardware is properly assembled
-
-**Computer doesn't recognize the device:**
-- Try unplugging and plugging it back in
-- Use a different USB cable
-- Restart your computer
-
-### Configurator Issues
-
-**My device doesn't appear in the list:**
-- Make sure it's plugged in
-- Click "Refresh Ports" button
-- Try a different USB port
-- **Linux only:** You might need to run this command once:
-  ```bash
-  sudo usermod -a -G dialout $USER
-  ```
-  Then log out and log back in
-
-**Can't connect to device:**
-- Close any other programs that might be using the device
-- Unplug and replug the pedal
-- Restart the configurator app
-
-**Save fails:**
-- Check that you're still connected (look at the status bar)
-- Try disconnecting and reconnecting
-
-### Still Having Problems?
-
-- Make sure you're using the latest firmware and configurator
-- Check the [DEV.md](DEV.md) file for more technical information
-- Report issues on the project page
-
-## 🛠️ For Developers & Advanced Users
-
-Want to modify the firmware, build from source, or understand the technical details?
-
-Check out [DEV.md](DEV.md) for:
-- Firmware building and upload instructions
-- Serial protocol documentation
-- Source code information
-- Contribution guidelines
-
-## 📄 Credits & License
-
-- Hardware design: JayBomb999 - [Available on Ko-fi](https://ko-fi.com/s/10c3e43f22)
-- Firmware & software: This project
-
-This project is provided as-is for configuring PAAP devices.
+</div>
 
 ---
 
-## ⚖️ Legal Disclaimer
+## 🦶 What is this?
 
-**USE AT YOUR OWN RISK**
+The **PAAP** is a small USB foot pedal for arcade setups. It shows up as a plain **USB keyboard**, so every game, emulator and operating system understands it without drivers: press the pedal, and it presses a key.
 
-This software and firmware are provided "AS IS" without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose, and non-infringement.
+This repository contains an alternative **firmware** for the mini PAAP and the **PAAP Configurator** app to choose which key it presses. The hardware is designed by JayBomb999 and [available on Ko-fi](https://ko-fi.com/s/10c3e43f22).
 
-**Important Notes:**
+| | Component | Stack |
+|---|---|---|
+| 🧠 | [**Firmware**](firmware/) | C++ / Arduino on an ATmega32U4 (Arduino Micro) |
+| 🖥️ | [**Configurator**](app/) | Rust + [Slint](https://slint.dev), native on Linux, Windows and macOS |
 
-- The developers and contributors of this project assume **no liability** for any damages, losses, or issues arising from the use, misuse, or inability to use this software or hardware
-- This includes, but is not limited to: hardware damage, data loss, system malfunction, or any other direct or indirect consequences
-- By using this software, you acknowledge that you do so at your own risk
-- Users are responsible for ensuring compatibility with their systems and compliance with local regulations
-- This project is an independent effort and is not affiliated with or endorsed by any hardware manufacturer unless explicitly stated
+<div align="center">
+<img src="images/screenshot.png" alt="PAAP Configurator connected to Pedal 3" width="640">
+</div>
 
-**For Hobbyist and Educational Use:**
+## ✨ Features
+
+<table>
+<tr>
+<td width="50%" valign="top">
+
+#### 🎮 Pedal
+- **Plug and play**: USB HID keyboard, no drivers needed
+- **Any key**: letters, digits, space and symbols; default is `l`
+- **Remembers its settings** in EEPROM, even when unplugged
+- **Pedal number 1–16**: tell several pedals apart in the app and the OS
+
+</td>
+<td width="50%" valign="top">
+
+#### 🖥️ Configurator
+- **Press a key to bind it**: click the keycap, press the key, save
+- **Finds your pedals**: numbered pedals first, with port and `[VID:PID]`
+- **Hot-plug aware**: the device list refreshes while disconnected
+- **Light / Dark / System** themes
+
+</td>
+</tr>
+</table>
+
+**Perfect for** light gun games (reload pedal), racing simulators (clutch, brake, gear shift), accessibility (hands-free input) and streaming (push-to-talk, scene switching).
+
+## 🚀 Quick start
+
+1. **Grab the latest release** from the [Releases page](https://github.com/tbreckle/paap_pedal_software/releases):
+
+   | File | What it is |
+   |---|---|
+   | `paap-firmware-X.Y.Z.hex` | Firmware for the pedal |
+   | `paap-configurator-X.Y.Z-windows-x86_64.zip` | Configurator for Windows |
+   | `paap-configurator-X.Y.Z-linux-x86_64.tar.gz` | Configurator for Linux |
+   | `paap-configurator-X.Y.Z-macos-universal.tar.gz` | Configurator for macOS (Apple Silicon + Intel) |
+
+2. **Plug in the pedal.** It works right away and types `l`.
+3. **Run the configurator** (no installation needed), pick your pedal and click **Connect**.
+   - **Linux:** `tar -xzf paap-configurator-*-linux-x86_64.tar.gz && ./paap-configurator-*/paap-configurator`
+   - **macOS:** the app is unsigned; on the first start, right-click → **Open**.
+4. **Click the keycap, press the key** the pedal should send, and click **Save to pedal**. Done!
+
+> [!TIP]
+> Use the configurator and firmware from the **same release**. Builds labeled `0.0.0+<commit>` are unofficial development builds.
+
+## 🦶🦶 Multiple pedals
+
+All pedals are the same board, so without help they look identical to your computer ("Arduino Micro", same USB IDs). Give each pedal its own **pedal number** from 1 to 16:
+
+1. Connect to a pedal, set **Pedal number**, and click **Save to pedal**.
+2. The pedal briefly reconnects and then shows up as **`PAAP Pedal 2 (COM5) [2341:8037]`**; the app reconnects automatically.
+
+The number is part of the pedal's USB serial number (`…PAAP02`), so other tools can tell your pedals apart too, for example through `/dev/serial/by-id/` on Linux. Pedals with the 1.0 firmware can't store a number yet; update their firmware first.
+
+## ❓ Troubleshooting
+
+<details>
+<summary><b>The pedal doesn't type anything</b></summary>
+
+- Check that the USB cable is fully plugged in, or try a different USB port or cable.
+- Make sure the pedal hardware is properly assembled.
+- Unplug and replug the pedal.
+
+</details>
+
+<details>
+<summary><b>My pedal doesn't show up in the configurator</b></summary>
+
+- Make sure it's plugged in; the list refreshes every 2 seconds (or click the refresh button).
+- **Linux:** add yourself to the `dialout` group once, then log out and back in:
+  ```bash
+  sudo usermod -a -G dialout $USER
+  ```
+
+</details>
+
+<details>
+<summary><b>Can't connect, or saving fails</b></summary>
+
+- Close other programs that might be using the pedal's serial port.
+- Unplug and replug the pedal, then connect again.
+- After changing the pedal number, Windows may give the pedal a new COM port; that's expected.
+
+</details>
+
+More technical details are in [DEV.md](DEV.md).
+
+## 🔧 Building from source
+
+<details>
+<summary><b>🖥️ Configurator (Rust)</b></summary>
+
+**Requirements:** [Rust](https://rustup.rs/); the toolchain (1.98) is pinned in `app/rust-toolchain.toml` and installed automatically. On Linux you also need `libudev-dev`, `libfontconfig-dev` and `pkg-config`.
+
+```bash
+cd app
+cargo run --release     # build and launch
+cargo test              # unit tests
+cargo clippy            # lint (warnings fail CI)
+cargo fmt --check       # formatting check
+```
+
+</details>
+
+<details>
+<summary><b>🧠 Firmware (Arduino)</b></summary>
+
+**Requirements:** Arduino AVR Boards core **1.8.6**, libraries **Bounce2 2.71.0** and **Keyboard 1.0.6**.
+
+```bash
+arduino-cli compile --fqbn arduino:avr:micro firmware/
+arduino-cli upload  --fqbn arduino:avr:micro -p /dev/ttyACM0 firmware/
+```
+
+With the Arduino IDE: open `firmware/firmware.ino`, select **Arduino Micro**, and upload. The serial protocol and all other details are in [DEV.md](DEV.md).
+
+</details>
+
+<details>
+<summary><b>🗂️ Repository layout</b></summary>
+
+```
+paap_pedal_software/
+├── firmware/              # Arduino/C++ firmware for the ATmega32U4
+├── app/                   # Rust/Slint configurator
+│   ├── ui/app.slint       # UI definition
+│   └── src/               # ui.rs, serial.rs, config.rs
+├── images/                # App icon and screenshot
+├── scripts/               # version.sh, changelog.sh, test.sh
+└── .github/workflows/     # CI, release-start, release-finish
+```
+
+</details>
+
+## 🤝 Contributing
+
+Contributions are welcome! The project uses **GitFlow**: branch `feature/*` off `develop` and open a PR back to `develop`. CI builds the app on all three platforms, builds the firmware and runs the linters on every push.
+
+- 📖 [GITFLOW.md](GITFLOW.md): branching, versioning and releases
+- ⚙️ [.github/WORKFLOWS.md](.github/WORKFLOWS.md): the CI/CD pipelines
+- 📝 [CHANGELOG.md](CHANGELOG.md): add your change under `## [Unreleased]`
+
+## 📜 License & credits
+
+PAAP firmware and configurator are released under the [MIT License](LICENSE).
+
+- 🔩 Hardware design: **JayBomb999**, [available on Ko-fi](https://ko-fi.com/s/10c3e43f22)
+- 🎨 Button icons: [Lucide](https://lucide.dev) ([ISC License](app/ui/icons/LICENSE))
+
+### Made with Slint
+
+<a href="https://slint.dev">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://slint.dev/logo/MadeWithSlint-logo-dark.svg">
+    <img alt="#MadeWithSlint" src="https://slint.dev/logo/MadeWithSlint-logo-light.svg" height="60">
+  </picture>
+</a>
+
+The configurator's user interface is built with [Slint](https://slint.dev), used under the [Slint Royalty-free Desktop, Mobile, and Web Applications License 2.0](https://github.com/slint-ui/slint/blob/master/LICENSES/LicenseRef-Slint-Royalty-free-2.0.md). The app also shows the Slint attribution in its **About** dialog.
+
+<details>
+<summary><b>⚖️ Legal disclaimer</b></summary>
+
+**USE AT YOUR OWN RISK.** This software and firmware are provided "AS IS" without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose, and non-infringement.
+
+- The developers and contributors of this project assume **no liability** for any damages, losses, or issues arising from the use, misuse, or inability to use this software or hardware.
+- This includes, but is not limited to: hardware damage, data loss, system malfunction, or any other direct or indirect consequences.
+- By using this software, you acknowledge that you do so at your own risk.
+- Users are responsible for ensuring compatibility with their systems and compliance with local regulations.
+- This project is an independent effort and is not affiliated with or endorsed by any hardware manufacturer unless explicitly stated.
 
 This project is intended for personal, educational, and hobbyist use. Users modifying firmware or hardware configurations should have appropriate technical knowledge and accept full responsibility for their modifications.
 
-If you're unsure about any aspect of installation or use, please consult the documentation or seek assistance from knowledgeable individuals before proceeding.
+</details>
+
+---
+
+<div align="center">
+
+**🪙 INSERT COIN TO CONTINUE 🪙**
+
+<sub>Built for lightgun and arcade fans.</sub>
+
+</div>

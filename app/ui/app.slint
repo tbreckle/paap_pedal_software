@@ -1,0 +1,469 @@
+// PAAP Configurator UI.
+//
+// All state lives in Rust (src/ui.rs). This file only renders the properties it gets and
+// reports user actions through callbacks.
+
+import {
+    AboutSlint,
+    Button,
+    ComboBox,
+    HorizontalBox,
+    Palette,
+    ScrollView,
+    SpinBox,
+    Spinner,
+    VerticalBox,
+} from "std-widgets.slint";
+
+// Full-window backdrop that blocks input to the UI below and centers a dialog panel. The
+// content scrolls if the window is too small; the Close button always stays visible. Esc and
+// clicks on the backdrop close the dialog as well.
+component Modal inherits Rectangle {
+    in property <length> dialog-width: 400px;
+    callback close();
+
+    background: #00000099;
+
+    TouchArea {
+        clicked => {
+            root.close();
+        }
+    }
+
+    FocusScope {
+        init => {
+            self.focus();
+        }
+        key-pressed(event) => {
+            if event.text == Key.Escape {
+                root.close();
+                return accept;
+            }
+            reject
+        }
+    }
+
+    Rectangle {
+        width: min(root.dialog-width, root.width - 32px);
+        height: min(content.preferred-height + footer.preferred-height, root.height - 32px);
+        x: (root.width - self.width) / 2;
+        y: (root.height - self.height) / 2;
+        background: Palette.background;
+        border-color: Palette.border;
+        border-width: 1px;
+        border-radius: 8px;
+        clip: true;
+
+        // Swallow clicks on the panel.
+        TouchArea { }
+
+        VerticalLayout {
+            ScrollView {
+                vertical-stretch: 1;
+                content := VerticalBox {
+                    @children
+                }
+            }
+
+            footer := HorizontalBox {
+                alignment: end;
+                Button {
+                    text: "Close";
+                    clicked => {
+                        root.close();
+                    }
+                }
+            }
+        }
+    }
+}
+
+// A keycap that captures the next key press after it was clicked.
+component KeyCapture inherits Rectangle {
+    in property <string> key-text;
+    in property <bool> enabled;
+    out property <bool> capturing: focus-scope.has-focus;
+    // Returns true if the key was accepted.
+    callback key-captured(string) -> bool;
+
+    width: 88px;
+    height: 72px;
+    border-radius: 12px;
+    border-width: self.capturing ? 3px : 1px;
+    border-color: self.capturing ? Palette.accent-background : Palette.border;
+    background: Palette.control-background;
+    opacity: root.enabled ? 1 : 0.5;
+
+    // Key shadow.
+    Rectangle {
+        y: parent.height - 8px;
+        height: 6px;
+        x: 6px;
+        width: parent.width - 12px;
+        border-radius: 3px;
+        background: Palette.border;
+    }
+
+    Text {
+        y: 4px;
+        height: parent.height - 14px;
+        text: root.capturing ? "…" : root.key-text;
+        font-size: root.key-text == "Space" && !root.capturing ? 16px : 30px;
+        font-weight: 700;
+        horizontal-alignment: center;
+        vertical-alignment: center;
+        color: Palette.control-foreground;
+    }
+
+    TouchArea {
+        enabled: root.enabled;
+        mouse-cursor: pointer;
+        clicked => {
+            focus-scope.focus();
+        }
+    }
+
+    focus-scope := FocusScope {
+        enabled: root.enabled;
+        key-pressed(event) => {
+            if event.text == Key.Tab || event.text == Key.Backtab {
+                return reject;
+            }
+            if event.text == Key.Escape || root.key-captured(event.text) {
+                self.clear-focus();
+            }
+            accept
+        }
+    }
+}
+
+export component AppWindow inherits Window {
+    title: "PAAP Configurator " + root.app-version;
+    icon: @image-url("../../images/icon.png");
+    preferred-width: 640px;
+    min-width: 520px;
+    min-height: 330px;
+
+    in property <string> app-version;
+
+    // Theme: 0 = System, 1 = Dark, 2 = Light.
+    in-out property <int> theme;
+
+    // Device list and connection.
+    in property <[string]> port-labels;
+    in property <bool> has-ports;
+    in-out property <int> port-index;
+    in property <bool> connected;
+    in property <string> connection-text;
+
+    // Pedal settings.
+    in property <string> key-text;
+    in property <string> key-description;
+    in-out property <int> pedal-number: 1;
+    in property <bool> pedal-supported;
+    in property <string> pedal-hint;
+    in property <bool> can-save;
+
+    // Status line and background operations.
+    in property <string> message;
+    in property <bool> message-is-error;
+    in property <bool> busy;
+    in property <string> busy-message;
+
+    in-out property <bool> show-about;
+
+    callback refresh-ports();
+    callback port-selected(int);
+    callback connect(int);
+    callback disconnect();
+    callback key-captured(string) -> bool;
+    callback pedal-edited(int);
+    callback save();
+    callback theme-selected(int);
+
+    function apply-theme() {
+        Palette.color-scheme = root.theme == 1 ? ColorScheme.dark : root.theme == 2 ? ColorScheme.light : ColorScheme.unknown;
+    }
+
+    init => {
+        root.apply-theme();
+    }
+    changed theme => {
+        root.apply-theme();
+    }
+
+    VerticalBox {
+        // Device selection.
+        HorizontalBox {
+            padding: 0;
+            ComboBox {
+                horizontal-stretch: 1;
+                model: root.port-labels;
+                current-index <=> root.port-index;
+                enabled: root.has-ports && !root.connected;
+                selected => {
+                    root.port-selected(self.current-index);
+                }
+            }
+
+            Button {
+                icon: @image-url("icons/refresh-cw.svg");
+                colorize-icon: true;
+                enabled: !root.connected;
+                accessible-label: "Refresh device list";
+                clicked => {
+                    root.refresh-ports();
+                }
+            }
+
+            if !root.connected: Button {
+                text: "Connect";
+                icon: @image-url("icons/plug-zap.svg");
+                colorize-icon: true;
+                primary: true;
+                enabled: root.has-ports;
+                clicked => {
+                    root.connect(root.port-index);
+                }
+            }
+            if root.connected: Button {
+                text: "Disconnect";
+                icon: @image-url("icons/unplug.svg");
+                colorize-icon: true;
+                clicked => {
+                    root.disconnect();
+                }
+            }
+        }
+
+        // Pedal settings.
+        Rectangle {
+            vertical-stretch: 1;
+            border-radius: 8px;
+            border-width: 1px;
+            border-color: Palette.border;
+            background: Palette.alternate-background;
+
+            VerticalLayout {
+                alignment: center;
+                padding: 16px;
+
+                GridLayout {
+                    spacing-horizontal: 32px;
+                    spacing-vertical: 8px;
+
+                    Row {
+                        HorizontalLayout {
+                            alignment: center;
+                            spacing: 6px;
+                            Image {
+                                source: @image-url("icons/keyboard.svg");
+                                colorize: Palette.alternate-foreground;
+                                width: 18px;
+                            }
+
+                            Text {
+                                text: "Key to emulate";
+                                font-weight: 600;
+                                vertical-alignment: center;
+                            }
+                        }
+
+                        HorizontalLayout {
+                            alignment: center;
+                            spacing: 6px;
+                            Image {
+                                source: @image-url("icons/footprints.svg");
+                                colorize: Palette.alternate-foreground;
+                                width: 18px;
+                            }
+
+                            Text {
+                                text: "Pedal number";
+                                font-weight: 600;
+                                vertical-alignment: center;
+                            }
+                        }
+                    }
+
+                    Row {
+                        HorizontalLayout {
+                            alignment: center;
+                            key-capture := KeyCapture {
+                                key-text: root.key-text;
+                                enabled: root.connected;
+                                key-captured(text) => {
+                                    return root.key-captured(text);
+                                }
+                            }
+                        }
+
+                        VerticalLayout {
+                            alignment: center;
+                            HorizontalLayout {
+                                alignment: center;
+                                SpinBox {
+                                    width: 110px;
+                                    minimum: 1;
+                                    maximum: 16;
+                                    value <=> root.pedal-number;
+                                    enabled: root.connected && root.pedal-supported;
+                                    edited(value) => {
+                                        root.pedal-edited(value);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    Row {
+                        Text {
+                            text: key-capture.capturing ? "Press a key (Esc cancels)" : root.key-description == "" ? "Click to change" : root.key-description + " · click to change";
+                            font-size: 11px;
+                            horizontal-alignment: center;
+                            color: Palette.alternate-foreground.transparentize(0.4);
+                        }
+
+                        Text {
+                            text: root.pedal-hint;
+                            font-size: 11px;
+                            horizontal-alignment: center;
+                            wrap: word-wrap;
+                            color: Palette.alternate-foreground.transparentize(0.4);
+                        }
+                    }
+                }
+            }
+        }
+
+        HorizontalBox {
+            padding: 0;
+            Text {
+                horizontal-stretch: 1;
+                text: root.message;
+                vertical-alignment: center;
+                wrap: word-wrap;
+                color: root.message-is-error ? #e5484d : Palette.foreground;
+            }
+
+            Button {
+                text: "Save to pedal";
+                icon: @image-url("icons/save.svg");
+                colorize-icon: true;
+                primary: true;
+                enabled: root.can-save;
+                clicked => {
+                    root.save();
+                }
+            }
+        }
+
+        // Status bar.
+        HorizontalBox {
+            padding: 0;
+            VerticalLayout {
+                alignment: center;
+                Rectangle {
+                    width: 10px;
+                    height: 10px;
+                    border-radius: 5px;
+                    background: root.connected ? #30a46c : Palette.border;
+                }
+            }
+
+            Text {
+                horizontal-stretch: 1;
+                text: root.connection-text;
+                vertical-alignment: center;
+                overflow: elide;
+            }
+
+            ComboBox {
+                width: 110px;
+                model: ["System", "Dark", "Light"];
+                current-index <=> root.theme;
+                selected => {
+                    root.theme-selected(self.current-index);
+                }
+            }
+
+            Button {
+                icon: @image-url("icons/info.svg");
+                colorize-icon: true;
+                accessible-label: "About";
+                clicked => {
+                    root.show-about = true;
+                }
+            }
+        }
+    }
+
+    if root.show-about: Modal {
+        close => {
+            root.show-about = false;
+        }
+
+        HorizontalLayout {
+            alignment: center;
+            spacing: 12px;
+            Image {
+                source: @image-url("../../images/icon.png");
+                width: 56px;
+                height: 56px;
+            }
+
+            VerticalLayout {
+                alignment: center;
+                Text {
+                    text: "PAAP Configurator";
+                    font-size: 16px;
+                    font-weight: 700;
+                }
+
+                Text {
+                    text: "Version " + root.app-version;
+                }
+            }
+        }
+
+        Text {
+            text: "Configuration tool for the PAAP (Perfectly Adequate Arcade Pedal).\nhttps://github.com/tbreckle/paap_pedal_software\nIcons by Lucide (ISC License).";
+            wrap: word-wrap;
+            horizontal-alignment: center;
+            font-size: 12px;
+        }
+
+        AboutSlint { }
+    }
+
+    // Blocks all input while a background operation is running.
+    if root.busy: Rectangle {
+        background: #000000b4;
+
+        TouchArea { }
+
+        Rectangle {
+            width: busy-content.preferred-width;
+            height: busy-content.preferred-height;
+            background: Palette.background;
+            border-color: Palette.border;
+            border-width: 1px;
+            border-radius: 8px;
+
+            busy-content := VerticalBox {
+                padding: 20px;
+                alignment: center;
+                Spinner {
+                    indeterminate: true;
+                    min-width: 40px;
+                    min-height: 40px;
+                }
+
+                Text {
+                    text: root.busy-message;
+                    horizontal-alignment: center;
+                }
+            }
+        }
+    }
+}
